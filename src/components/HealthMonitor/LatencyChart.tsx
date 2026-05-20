@@ -1,80 +1,37 @@
 interface LatencyChartProps {
-  data: number[];
+  data: number[]
 }
 
-export default function LatencyChart({ data }: LatencyChartProps) {
-  const width = 200;
-  const height = 40;
-  const padding = 2;
+export function LatencyChart({ data }: LatencyChartProps) {
+  if (data.length === 0) return null
 
-  const maxVal = Math.max(...data, 1);
-  const minVal = Math.min(...data, 0);
-  const range = maxVal - minVal || 1;
+  const width = 200
+  const height = 40
+  const max = Math.max(...data, 1)
+  const min = Math.min(...data)
+  const range = max - min || 1
 
-  // Build SVG polyline points
-  const points = data.map((value, i) => {
-    const x = padding + (i / (data.length - 1)) * (width - padding * 2);
-    const y = padding + (1 - (value - minVal) / range) * (height - padding * 2);
-    return `${x},${y}`;
-  });
+  const points = data.map((val, i) => {
+    const x = (i / (data.length - 1)) * width
+    const y = height - ((val - min) / range) * (height - 4) - 2
+    return `${x},${y}`
+  }).join(' ')
 
-  const polylinePoints = points.join(' ');
+  const avgLatency = data.reduce((a, b) => a + b, 0) / data.length
+  const lineColor = avgLatency > 300 ? '#ef4444' : avgLatency > 150 ? '#eab308' : '#34d399'
 
-  // Closed polygon for the gradient fill area
-  const firstX = padding;
-  const lastX = padding + ((data.length - 1) / (data.length - 1)) * (width - padding * 2);
-  const fillPoints = `${firstX},${height} ${polylinePoints} ${lastX},${height}`;
-
-  // Determine color based on average latency
-  const avg = data.reduce((sum, v) => sum + v, 0) / data.length;
-  let strokeColor: string;
-  let gradientId: string;
-
-  if (avg < 100) {
-    strokeColor = '#34d399'; // emerald-400
-    gradientId = 'gradGreen';
-  } else if (avg < 250) {
-    strokeColor = '#facc15'; // yellow-400
-    gradientId = 'gradYellow';
-  } else {
-    strokeColor = '#f87171'; // red-400
-    gradientId = 'gradRed';
-  }
+  const fillPoints = `0,${height} ${points} ${width},${height}`
 
   return (
-    <svg
-      width={width}
-      height={height}
-      viewBox={`0 0 ${width} ${height}`}
-      className="flex-shrink-0"
-    >
+    <svg width={width} height={height} className="flex-shrink-0">
       <defs>
-        <linearGradient id="gradGreen" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#34d399" stopOpacity="0.3" />
-          <stop offset="100%" stopColor="#34d399" stopOpacity="0" />
-        </linearGradient>
-        <linearGradient id="gradYellow" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#facc15" stopOpacity="0.3" />
-          <stop offset="100%" stopColor="#facc15" stopOpacity="0" />
-        </linearGradient>
-        <linearGradient id="gradRed" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#f87171" stopOpacity="0.3" />
-          <stop offset="100%" stopColor="#f87171" stopOpacity="0" />
+        <linearGradient id={`grad-${lineColor}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={lineColor} stopOpacity="0.3" />
+          <stop offset="100%" stopColor={lineColor} stopOpacity="0" />
         </linearGradient>
       </defs>
-
-      {/* Gradient fill below the line */}
-      <polygon points={fillPoints} fill={`url(#${gradientId})`} />
-
-      {/* Sparkline */}
-      <polyline
-        points={polylinePoints}
-        fill="none"
-        stroke={strokeColor}
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <polygon points={fillPoints} fill={`url(#grad-${lineColor})`} />
+      <polyline points={points} fill="none" stroke={lineColor} strokeWidth="1.5" strokeLinejoin="round" />
     </svg>
-  );
+  )
 }
