@@ -30,11 +30,6 @@ export function HealthPanel() {
       </div>
       <div className="space-y-4">
         {servers.map((server) => (
-          <div key={server.name} className="flex items-center gap-4 p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors">
-            <StatusIndicator status={server.status} />
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-white">{server.name}</div>
-              <div className="text-xs text-gray-400">{server.latency}ms · {server.uptime}% uptime</div>
           <div
             key={server.name}
             className="flex items-center gap-4 p-3 rounded-lg bg-gray-800/30 hover:bg-gray-800/50 transition-colors"
