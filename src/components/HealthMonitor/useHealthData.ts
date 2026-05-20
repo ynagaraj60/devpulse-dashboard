@@ -9,6 +9,7 @@ interface ServerHealth {
 }
 
 function randomLatency(): number {
+  return Math.random() < 0.1 ? Math.floor(Math.random() * 300) + 200 : Math.floor(Math.random() * 150) + 10
   return Math.random() < 0.1
     ? Math.floor(Math.random() * 300) + 200
     : Math.floor(Math.random() * 150) + 10

@@ -29,11 +29,14 @@ export function LatencyChart({ data }: LatencyChartProps) {
   return (
     <svg width={width} height={height} className="flex-shrink-0">
       <defs>
+        <linearGradient id={`grad-${lineColor}`} x1="0" y1="0" x2="0" y2="1">
         <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={lineColor} stopOpacity="0.3" />
           <stop offset="100%" stopColor={lineColor} stopOpacity="0" />
         </linearGradient>
       </defs>
+      <polygon points={fillPoints} fill={`url(#grad-${lineColor})`} />
+      <polyline points={points} fill="none" stroke={lineColor} strokeWidth="1.5" strokeLinejoin="round" />
       <polygon points={fillPoints} fill={`url(#${gradientId})`} />
       <polyline
         points={points}
